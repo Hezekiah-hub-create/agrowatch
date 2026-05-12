@@ -117,50 +117,6 @@ export default function LandingPage() {
               <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#ef4444', letterSpacing: '0.05em' }}>LIVE FEED ANALYSIS</div>
             </div>
 
-            {/* Enhanced Plant Tracking Info - Bottom Left */}
-            <div className="glass-strong desktop-only" style={{ 
-              position: 'absolute', bottom: 40, left: -30, 
-              padding: '20px', 
-              display: 'flex', flexDirection: 'column', gap: 12, 
-              zIndex: 10,
-              minWidth: 240,
-              border: '1px solid var(--accent)',
-              boxShadow: '0 0 40px var(--accent-dim)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Crosshair size={18} color="var(--accent)" />
-                  <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--text-primary)' }}>Target Acquisition</div>
-                </div>
-                <div style={{ fontSize: '0.65rem', color: 'var(--accent)', fontWeight: 700 }}>98.4% CONF</div>
-              </div>
-              
-              <div style={{ height: '1px', background: 'var(--border)' }} />
-              
-              <div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Current Asset</div>
-                <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-primary)' }}>Tomato Plot #124</div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 2 }}>Status</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)' }} />
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--accent)' }}>Healthy</span>
-                  </div>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 2 }}>Vitality</div>
-                  <div style={{ width: '100%', height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-                    <div style={{ width: '92%', height: '100%', background: 'var(--accent)' }} />
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ position: 'absolute', top: -1, left: -1, width: 10, height: 10, borderLeft: '2px solid var(--accent)', borderTop: '2px solid var(--accent)' }} />
-              <div style={{ position: 'absolute', bottom: -1, right: -1, width: 10, height: 10, borderRight: '2px solid var(--accent)', borderBottom: '2px solid var(--accent)' }} />
-            </div>
           </div>
         </div>
       </section>
