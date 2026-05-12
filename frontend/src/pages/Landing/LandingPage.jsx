@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
 import ThemeToggle from '../../components/UI/ThemeToggle';
+import Logo from '../../components/UI/Logo';
 import { Leaf, ShieldCheck, ShoppingBag, ArrowRight, Scan, MapPin, BarChart3, Database, Users, Globe, Activity, Crosshair } from 'lucide-react';
 import heroDrone from '../../assets/hero_drone.png';
 
@@ -20,14 +21,9 @@ export default function LandingPage() {
         padding: 'var(--sp-4) 0'
       }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
-            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Leaf size={24} color="#0a1410" strokeWidth={2.5} />
-            </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, fontFamily: 'Plus Jakarta Sans', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>AgroWatch</span>
-          </div>
+          <Logo size={40} iconSize={24} />
           
-          <div style={{ display: 'flex', gap: 'var(--sp-8)', alignItems: 'center' }}>
+          <div className="desktop-only" style={{ display: 'flex', gap: 'var(--sp-8)', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: 'var(--sp-6)', alignItems: 'center' }}>
               <a href="#features" style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Features</a>
               <a href="#how-it-works" style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--text-secondary)' }}>How it Works</a>
@@ -39,16 +35,21 @@ export default function LandingPage() {
               <Link to="/register"><Button>Get Started</Button></Link>
             </div>
           </div>
+
+          <div className="mobile-only" style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
+            <ThemeToggle />
+            <Link to="/login"><Button size="sm">Login</Button></Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section style={{ 
         position: 'relative', 
-        padding: '180px 0 120px', 
+        padding: 'clamp(120px, 15vh, 180px) 0 clamp(60px, 10vh, 120px)', 
         background: 'radial-gradient(circle at top right, var(--accent-dim), transparent 50%), radial-gradient(circle at bottom left, var(--amber-dim), transparent 50%)'
       }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 'var(--sp-12)', alignItems: 'center' }}>
+        <div className="container grid-hero">
           <div className="animate-fade-in" style={{ textAlign: 'left' }}>
             <Badge label="REVOLUTIONIZING GHANAIAN AGRICULTURE" variant="accent" style={{ marginBottom: 'var(--sp-6)' }} />
             <h1 style={{ 
@@ -71,7 +72,7 @@ export default function LandingPage() {
               <Button variant="ghost" size="lg">Watch the Video</Button>
             </div>
             
-            <div style={{ marginTop: 'var(--sp-12)', display: 'flex', gap: 'var(--sp-10)' }}>
+            <div style={{ marginTop: 'var(--sp-12)', display: 'flex', gap: 'var(--sp-8)', flexWrap: 'wrap' }}>
               <Stat label="Avg. Yield Increase" value="35%" />
               <Stat label="Disease Detection" value="98%" />
               <Stat label="Active Fields" value="450+" />
@@ -117,7 +118,7 @@ export default function LandingPage() {
             </div>
 
             {/* Enhanced Plant Tracking Info - Bottom Left */}
-            <div className="glass-strong" style={{ 
+            <div className="glass-strong desktop-only" style={{ 
               position: 'absolute', bottom: 40, left: -30, 
               padding: '20px', 
               display: 'flex', flexDirection: 'column', gap: 12, 
@@ -174,7 +175,7 @@ export default function LandingPage() {
             <p style={{ color: 'var(--text-secondary)', maxWidth: 600, margin: '0 auto', fontSize: '1.125rem' }}>Our integrated system handles the entire lifecycle from field data to market sale.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--sp-8)' }}>
+          <div className="grid-steps">
             <Step number="01" icon={<Globe size={24} />} title="Drone Deployment" desc="Deploy autonomous drones to capture high-res field imagery across your plots." />
             <Step number="02" icon={<Database size={24} />} title="AI Detection" desc="Our YOLOv8 models identify individual plants and track them across frames." />
             <Step number="03" icon={<ShieldCheck size={24} />} title="Expert Diagnosis" desc="The expert system analyzes symptoms and provides treatment advisories." />
@@ -186,17 +187,17 @@ export default function LandingPage() {
       {/* Call to Action */}
       <section className="container" style={{ padding: '120px 0' }}>
         <div className="glass-strong" style={{ 
-          padding: '100px 80px', 
+          padding: 'clamp(40px, 8vw, 100px) var(--container-px)', 
           textAlign: 'center', 
           borderRadius: 'var(--radius-xl)', 
           background: 'linear-gradient(135deg, var(--bg-card), var(--bg-surface))',
           border: '1px solid var(--border)'
         }}>
-          <h2 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: 'var(--sp-6)', color: 'var(--text-primary)' }}>Ready to scale your farm?</h2>
+          <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, marginBottom: 'var(--sp-6)', color: 'var(--text-primary)' }}>Ready to scale your farm?</h2>
           <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: 'var(--sp-10)', maxWidth: 640, margin: '0 auto var(--sp-10)' }}>
             Join the agricultural revolution today. Register your farm and get your first field scan processed for free.
           </p>
-          <div style={{ display: 'flex', gap: 'var(--sp-4)', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--sp-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/register"><Button size="lg">Create Your Account</Button></Link>
             <Button variant="ghost" size="lg">Contact Support</Button>
           </div>
@@ -205,11 +206,8 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{ borderTop: '1px solid var(--border)', padding: '80px 0', background: 'var(--bg-surface)' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
-            <Leaf size={24} color="var(--accent)" />
-            <span style={{ fontWeight: 800, fontSize: '1.5rem', color: 'var(--text-primary)' }}>AgroWatch</span>
-          </div>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--sp-6)' }}>
+          <Logo size={32} iconSize={18} />
           <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
             © 2025 AgroWatch Ghana. Built for Ho Technical University.
           </div>

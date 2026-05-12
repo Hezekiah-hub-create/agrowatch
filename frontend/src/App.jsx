@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import DashboardLayout from './components/Layout/DashboardLayout';
+import Logo from './components/UI/Logo';
 
 // Pages (to be implemented)
 import LandingPage from './pages/Landing/LandingPage';
@@ -20,8 +21,9 @@ function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   
   if (loading) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="skeleton" style={{ width: 40, height: 40, borderRadius: '50%' }}></div>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--sp-4)', background: 'var(--bg-base)' }}>
+      <Logo size={48} iconSize={24} className="animate-pulse" />
+      <div className="skeleton" style={{ width: 120, height: 4, borderRadius: 2 }}></div>
     </div>
   );
   

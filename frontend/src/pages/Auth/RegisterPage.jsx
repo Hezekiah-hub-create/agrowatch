@@ -79,7 +79,7 @@ export default function RegisterPage() {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Join the future of agricultural intelligence</p>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-5)' }}>
+          <form onSubmit={handleSubmit} className="grid-2" style={{ gap: 'var(--sp-5)' }}>
             <div style={{ gridColumn: 'span 2', display: 'flex', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', padding: 4, border: '1px solid var(--border)' }}>
               <button 
                 type="button"

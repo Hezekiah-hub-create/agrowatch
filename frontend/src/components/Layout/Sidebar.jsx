@@ -4,6 +4,7 @@ import {
   User, LogOut, Leaf, X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import Logo from '../UI/Logo';
 
 const FARMER_LINKS = [
   { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
@@ -42,20 +43,14 @@ export default function Sidebar({ mobileOpen, onClose }) {
         />
       )}
 
-      <aside style={{
-        position: 'fixed',
-        top: 0, left: 0,
-        width: 'var(--sidebar-w)',
-        height: '100vh',
-        background: 'var(--bg-surface)',
-        backdropFilter: 'blur(24px)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        zIndex: 50,
-        transition: 'transform 0.3s ease',
-        transform: mobileOpen ? 'translateX(0)' : undefined,
-      }}>
+      <aside 
+        className={`sidebar ${mobileOpen ? 'open' : ''}`}
+        style={{
+          backdropFilter: 'blur(24px)',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {/* Logo */}
         <div style={{
           padding: 'var(--sp-6)',
@@ -64,26 +59,16 @@ export default function Sidebar({ mobileOpen, onClose }) {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, var(--accent), #22c55e)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Leaf size={18} color="#0a1410" strokeWidth={2.5} />
-            </div>
-            <div>
-              <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '1.0625rem', lineHeight: 1, color: 'var(--text-primary)' }}>AgroWatch</div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2 }}>Volta Region</div>
-            </div>
-          </div>
+          <Logo />
           <button
             onClick={onClose}
+            className="mobile-only"
             style={{
-              display: 'none', width: 28, height: 28, border: 'none',
+              width: 28, height: 28, border: 'none',
               background: 'rgba(255,255,255,0.06)', borderRadius: 6,
               color: 'var(--text-secondary)', cursor: 'pointer',
               alignItems: 'center', justifyContent: 'center',
+              display: 'flex',
             }}
             id="sidebar-close-btn"
           >

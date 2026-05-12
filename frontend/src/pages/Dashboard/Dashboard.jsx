@@ -46,7 +46,7 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade-in">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h1 className="page-title">Welcome back, {user?.full_name?.split(' ')[0]}</h1>
           <p className="page-subtitle">Here is what's happening on your farm today.</p>
@@ -61,7 +61,7 @@ export default function Dashboard() {
         {stats.map((s, i) => <StatCard key={i} {...s} />)}
       </div>
 
-      <div className="grid-3" style={{ gridTemplateColumns: '2fr 1fr' }}>
+      <div className="dashboard-grid">
         {/* Recent Scans */}
         <Card style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

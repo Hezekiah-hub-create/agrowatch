@@ -2,6 +2,7 @@ import { Menu, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import ThemeToggle from '../UI/ThemeToggle';
+import Logo from '../UI/Logo';
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
@@ -17,22 +18,19 @@ export default function TopBar({ onMenuClick }) {
   const title = PAGE_TITLES[pathname] || (pathname.startsWith('/scan/') ? 'Scan Results' : 'AgroWatch');
 
   return (
-    <header style={{
-      position: 'fixed',
-      top: 0,
-      left: 'var(--sidebar-w)',
-      right: 0,
-      height: 'var(--topbar-h)',
-      background: 'var(--bg-base)',
-      opacity: 0.9,
-      backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid var(--border)',
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0 var(--sp-8)',
-      zIndex: 40,
-      gap: 'var(--sp-4)',
-    }}>
+    <header 
+      className="topbar"
+      style={{
+        background: 'var(--bg-base)',
+        opacity: 0.9,
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--border)',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 var(--container-px)',
+        gap: 'var(--sp-4)',
+      }}
+    >
       {/* Mobile menu btn */}
       <button
         onClick={onMenuClick}
@@ -51,6 +49,8 @@ export default function TopBar({ onMenuClick }) {
       >
         <Menu size={18} />
       </button>
+
+      <Logo className="mobile-only" size={32} iconSize={16} showText={false} />
 
       {/* Page title */}
       <h1 style={{ fontSize: '1.0625rem', fontWeight: 700, flex: 1, margin: 0, color: 'var(--text-primary)' }}>{title}</h1>

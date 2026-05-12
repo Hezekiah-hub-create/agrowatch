@@ -27,7 +27,7 @@ export default function Farms() {
 
   return (
     <div className="animate-fade-in">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header">
         <div>
           <h1 className="page-title">My Registered Farms</h1>
           <p className="page-subtitle">Manage your field plots and crop configurations.</p>
