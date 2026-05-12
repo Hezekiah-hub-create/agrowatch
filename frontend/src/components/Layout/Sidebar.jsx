@@ -1,0 +1,197 @@
+import { NavLink, useNavigate } from 'react-router-dom';
+import {
+  LayoutDashboard, Tractor, ScanLine, ShoppingBasket,
+  User, LogOut, Leaf, X,
+} from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+
+const FARMER_LINKS = [
+  { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
+  { to: '/farms',     icon: <Tractor size={18} />,         label: 'My Farms'  },
+  { to: '/scan',      icon: <ScanLine size={18} />,        label: 'New Scan'  },
+  { to: '/market',    icon: <ShoppingBasket size={18} />,  label: 'Market'    },
+  { to: '/profile',   icon: <User size={18} />,            label: 'Profile'   },
+];
+
+const BUYER_LINKS = [
+  { to: '/market',  icon: <ShoppingBasket size={18} />, label: 'Market Listings' },
+  { to: '/profile', icon: <User size={18} />,           label: 'Profile'         },
+];
+
+export default function Sidebar({ mobileOpen, onClose }) {
+  const { user, logout, isFarmer } = useAuth();
+  const navigate = useNavigate();
+  const links = isFarmer ? FARMER_LINKS : BUYER_LINKS;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          onClick={onClose}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+            zIndex: 49, display: 'none',
+          }}
+          className="mobile-overlay"
+        />
+      )}
+
+      <aside style={{
+        position: 'fixed',
+        top: 0, left: 0,
+        width: 'var(--sidebar-w)',
+        height: '100vh',
+        background: 'var(--bg-surface)',
+        backdropFilter: 'blur(24px)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 50,
+        transition: 'transform 0.3s ease',
+        transform: mobileOpen ? 'translateX(0)' : undefined,
+      }}>
+        {/* Logo */}
+        <div style={{
+          padding: 'var(--sp-6)',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 'var(--radius-md)',
+              background: 'linear-gradient(135deg, var(--accent), #22c55e)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Leaf size={18} color="#0a1410" strokeWidth={2.5} />
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '1.0625rem', lineHeight: 1, color: 'var(--text-primary)' }}>AgroWatch</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2 }}>Volta Region</div>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              display: 'none', width: 28, height: 28, border: 'none',
+              background: 'rgba(255,255,255,0.06)', borderRadius: 6,
+              color: 'var(--text-secondary)', cursor: 'pointer',
+              alignItems: 'center', justifyContent: 'center',
+            }}
+            id="sidebar-close-btn"
+          >
+            <X size={14} />
+          </button>
+        </div>
+
+        {/* User pill */}
+        <div style={{
+          margin: 'var(--sp-4) var(--sp-4) 0',
+          padding: 'var(--sp-3)',
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--accent-dim)',
+          border: '1px solid rgba(74,222,128,0.15)',
+          display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+        }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--accent), var(--amber))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 700, fontSize: '0.875rem', color: '#0a1410',
+            flexShrink: 0,
+          }}>
+            {user?.full_name?.charAt(0) || '?'}
+          </div>
+          <div style={{ overflow: 'hidden' }}>
+            <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user?.full_name}
+            </div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--accent)', textTransform: 'capitalize' }}>
+              {user?.user_role}
+            </div>
+          </div>
+        </div>
+
+        {/* Nav links */}
+        <nav style={{ flex: 1, padding: 'var(--sp-4)', overflowY: 'auto', marginTop: 'var(--sp-2)' }}>
+          <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 'var(--sp-3)', padding: '0 var(--sp-3)' }}>
+            Navigation
+          </div>
+          <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-1)' }}>
+            {links.map(({ to, icon, label }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  onClick={onClose}
+                  style={({ isActive }) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--sp-3)',
+                    padding: 'var(--sp-3)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.9rem',
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                    background: isActive ? 'var(--accent-dim)' : 'transparent',
+                    border: `1px solid ${isActive ? 'rgba(74,222,128,0.2)' : 'transparent'}`,
+                    transition: 'all 0.18s ease',
+                    textDecoration: 'none',
+                  })}
+                  onMouseEnter={e => {
+                    const a = e.currentTarget;
+                    if (!a.style.background.includes('accent-dim') && !a.className?.includes('active')) {
+                      a.style.background = 'rgba(255,255,255,0.04)';
+                      a.style.color = 'var(--text-primary)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    const a = e.currentTarget;
+                    if (!a.className?.includes('active')) {
+                      a.style.background = 'transparent';
+                      a.style.color = 'var(--text-secondary)';
+                    }
+                  }}
+                >
+                  {icon}
+                  {label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Logout */}
+        <div style={{ padding: 'var(--sp-4)', borderTop: '1px solid var(--border)' }}>
+          <button
+            onClick={handleLogout}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
+              width: '100%', padding: 'var(--sp-3)', borderRadius: 'var(--radius-md)',
+              background: 'transparent', border: '1px solid transparent',
+              color: 'var(--danger)', fontSize: '0.9rem', fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.18s ease', fontFamily: 'inherit',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'var(--danger-dim)';
+              e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.borderColor = 'transparent';
+            }}
+          >
+            <LogOut size={18} />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
