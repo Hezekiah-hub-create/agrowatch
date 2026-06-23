@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import Button from '../../components/UI/Button';
 import Card from '../../components/UI/Card';
 import Select from '../../components/UI/Select';
@@ -19,6 +20,7 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -28,7 +30,7 @@ export default function RegisterPage() {
       await register(formData);
       navigate('/dashboard');
     } catch (err) {
-      alert('Registration failed.');
+      addToast('Registration failed.', 'error');
     } finally {
       setLoading(false);
     }

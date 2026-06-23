@@ -8,7 +8,8 @@ export default function Select({
   placeholder = 'Select an option', 
   label,
   icon: Icon,
-  className = '' 
+  className = '',
+  disabled = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -33,11 +34,11 @@ export default function Select({
   };
 
   return (
-    <div className={`form-group ${className}`} ref={containerRef} style={{ position: 'relative' }}>
+    <div className={`form-group ${className}`} ref={containerRef} style={{ position: 'relative', zIndex: isOpen ? 50 : 'auto' }}>
       {label && <label className="form-label">{label}</label>}
       
       <div 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
         style={{
           background: 'var(--bg-input)',
           border: '1px solid var(--border)',
@@ -48,7 +49,8 @@ export default function Select({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          cursor: 'pointer',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.5 : 1,
           transition: 'all var(--ease)',
           boxShadow: isOpen ? '0 0 0 3px rgba(74, 222, 128, 0.1)' : 'none',
           borderColor: isOpen ? 'var(--accent)' : 'var(--border)',

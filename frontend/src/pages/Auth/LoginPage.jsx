@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import Button from '../../components/UI/Button';
 import Card from '../../components/UI/Card';
 import { Leaf, Phone, Lock, ChevronLeft } from 'lucide-react';
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -20,7 +22,7 @@ export default function LoginPage() {
       await login(phone, password);
       navigate('/dashboard');
     } catch (err) {
-      alert('Login failed. Please check your credentials.');
+      addToast('Login failed. Please check your credentials.', 'error');
     } finally {
       setLoading(false);
     }

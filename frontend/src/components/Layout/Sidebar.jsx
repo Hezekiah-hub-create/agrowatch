@@ -6,6 +6,14 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../UI/Logo';
 
+const getInitials = (name) => {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  return parts.length > 1 
+    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() 
+    : parts[0].substring(0, 2).toUpperCase();
+};
+
 const FARMER_LINKS = [
   { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
   { to: '/farms',     icon: <Tractor size={18} />,         label: 'My Farms'  },
@@ -81,18 +89,18 @@ export default function Sidebar({ mobileOpen, onClose }) {
           margin: 'var(--sp-4) var(--sp-4) 0',
           padding: 'var(--sp-3)',
           borderRadius: 'var(--radius-md)',
-          background: 'var(--accent-dim)',
-          border: '1px solid rgba(74,222,128,0.15)',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', gap: 'var(--sp-3)',
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--accent), var(--amber))',
+            background: 'var(--accent-dim)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: '0.875rem', color: '#0a1410',
+            fontWeight: 700, fontSize: '0.875rem', color: 'var(--accent)',
             flexShrink: 0,
           }}>
-            {user?.full_name?.charAt(0) || '?'}
+            {getInitials(user?.full_name)}
           </div>
           <div style={{ overflow: 'hidden' }}>
             <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

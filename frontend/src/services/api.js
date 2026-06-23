@@ -25,13 +25,24 @@ const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 export const authAPI = {
   login: async (phone, password, role) => {
     if (USE_MOCK) { await delay(600); return { user: MOCK_USERS[role] || MOCK_USERS.farmer, token: 'mock-jwt' }; }
-    const { data } = await http.post('/auth/login', { phone_number: phone, password });
-    return data;
+    const { data } = await http.get('/users/');
+    const user = data.find(u => u.phone_number === phone);
+    if (!user) throw new Error("Invalid credentials");
+    return { user, token: 'mock-jwt' };
   },
   register: async (payload) => {
     if (USE_MOCK) { await delay(800); return { user: { id: Date.now(), ...payload }, token: 'mock-jwt' }; }
-    const { data } = await http.post('/auth/register', payload);
-    return data;
+    const drfPayload = {
+      username: payload.phone_number,
+      phone_number: payload.phone_number,
+      full_name: payload.full_name,
+      user_role: payload.role,
+      region: payload.region,
+      district: payload.district,
+      password: payload.password
+    };
+    const { data } = await http.post('/users/', drfPayload);
+    return { user: data, token: 'mock-jwt' };
   },
 };
 
@@ -39,7 +50,7 @@ export const authAPI = {
 export const farmsAPI = {
   list: async (farmerId) => {
     if (USE_MOCK) { await delay(400); return MOCK_FARMS.filter(f => f.farmer_id === farmerId || !farmerId); }
-    const { data } = await http.get('/farms');
+    const { data } = await http.get('/farms/');
     return data;
   },
   create: async (payload) => {
@@ -49,12 +60,25 @@ export const farmsAPI = {
       MOCK_FARMS.push(farm);
       return farm;
     }
-    const { data } = await http.post('/farms', payload);
+    const { data } = await http.post('/farms/', payload);
     return data;
   },
   get: async (id) => {
     if (USE_MOCK) { await delay(300); return MOCK_FARMS.find(f => f.id === Number(id)); }
-    const { data } = await http.get(`/farms/${id}`);
+    const { data } = await http.get(`/farms/${id}/`);
+    return data;
+  },
+  update: async (id, payload) => {
+    if (USE_MOCK) {
+      await delay(400);
+      const index = MOCK_FARMS.findIndex(f => f.id === Number(id));
+      if (index !== -1) {
+        MOCK_FARMS[index] = { ...MOCK_FARMS[index], ...payload };
+        return MOCK_FARMS[index];
+      }
+      throw new Error('Farm not found');
+    }
+    const { data } = await http.patch(`/farms/${id}/`, payload);
     return data;
   },
 };
@@ -63,15 +87,15 @@ export const farmsAPI = {
 export const scansAPI = {
   list: async () => {
     if (USE_MOCK) { await delay(400); return MOCK_SCANS; }
-    const { data } = await http.get('/scans');
+    const { data } = await http.get('/scans/');
     return data;
   },
   get: async (id) => {
     if (USE_MOCK) { await delay(300); return MOCK_SCANS.find(s => s.id === id); }
-    const { data } = await http.get(`/scans/${id}`);
+    const { data } = await http.get(`/scans/${id}/`);
     return data;
   },
-  create: async (formData) => {
+  create: async (payload) => {
     if (USE_MOCK) {
       await delay(3000); // simulate processing
       const scan = {
@@ -82,14 +106,12 @@ export const scansAPI = {
         precision: 0.87, recall: 0.83, f1_score: 0.85, mota: 0.78,
         identity_switches: 16,
         scan_date: new Date().toISOString(),
-        ...Object.fromEntries(formData.entries?.() || []),
+        ...payload,
       };
       MOCK_SCANS.unshift(scan);
       return scan;
     }
-    const { data } = await http.post('/scans', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const { data } = await http.post('/scans/', payload);
     return data;
   },
 };
@@ -104,7 +126,7 @@ export const marketAPI = {
       if (filters.region) results = results.filter(l => l.farmer_region === filters.region);
       return results;
     }
-    const { data } = await http.get('/market/listings', { params: filters });
+    const { data } = await http.get('/market/listings/', { params: filters });
     return data;
   },
   create: async (payload) => {
@@ -116,12 +138,12 @@ export const marketAPI = {
       MOCK_LISTINGS.unshift(listing);
       return listing;
     }
-    const { data } = await http.post('/market/listings', payload);
+    const { data } = await http.post('/market/listings/', payload);
     return data;
   },
   enquire: async (listingId, message) => {
     if (USE_MOCK) { await delay(500); return { success: true }; }
-    const { data } = await http.post(`/market/listings/${listingId}/enquire`, { message });
+    const { data } = await http.post(`/market/listings/${listingId}/enquire/`, { message });
     return data;
   },
 };

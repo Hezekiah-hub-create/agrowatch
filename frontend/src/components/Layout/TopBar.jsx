@@ -4,6 +4,14 @@ import { useLocation } from 'react-router-dom';
 import ThemeToggle from '../UI/ThemeToggle';
 import Logo from '../UI/Logo';
 
+const getInitials = (name) => {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  return parts.length > 1 
+    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() 
+    : parts[0].substring(0, 2).toUpperCase();
+};
+
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
   '/farms':     'My Farms',
@@ -92,11 +100,11 @@ export default function TopBar({ onMenuClick }) {
         }}>
           <div style={{
             width: 28, height: 28, borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--accent), var(--amber))',
+            background: 'var(--accent-dim)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: '0.75rem', color: '#0a1410',
+            fontWeight: 700, fontSize: '0.75rem', color: 'var(--accent)',
           }}>
-            {user?.full_name?.charAt(0) || '?'}
+            {getInitials(user?.full_name)}
           </div>
           <span style={{ fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
             {user?.full_name?.split(' ')[0]}

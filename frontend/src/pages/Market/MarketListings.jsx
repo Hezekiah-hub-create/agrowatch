@@ -1,156 +1,214 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { marketAPI } from '../../services/api';
+import { Link } from 'react-router-dom';
+import { ShoppingBasket, Plus, MapPin, Tag, Calendar, MessageCircle, Filter } from 'lucide-react';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
-import ListingCard from '../../components/Market/ListingCard';
 import Modal from '../../components/UI/Modal';
-import { ShoppingBasket, Search, Filter, Plus, Send } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { CROPS, REGIONS } from '../../data/mockData';
+import Badge from '../../components/UI/Badge';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { marketAPI } from '../../services/api';
+import { CROP_ICONS } from '../../data/mockData';
 
 export default function MarketListings() {
   const { isFarmer } = useAuth();
+  const { addToast } = useToast();
   const [listings, setListings] = useState([]);
+  const [filter, setFilter] = useState('all');
+
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ crop_type: '', region: '' });
-  const [selectedListing, setSelectedListing] = useState(null);
-  const [enquiry, setEnquiry] = useState('');
-  const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    loadListings();
-  }, [filters]);
-
-  async function loadListings() {
-    setLoading(true);
-    try {
-      const res = await marketAPI.list(filters);
-      setListings(res);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+    async function loadListings() {
+      setLoading(true);
+      try {
+        const filters = filter !== 'all' ? { crop_type: filter } : {};
+        const results = await marketAPI.list(filters);
+        // Ensure only active listings
+        setListings(results.filter(l => l.listing_status === 'active'));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+    loadListings();
+  }, [filter]);
 
-  const handleEnquire = async (e) => {
-    e.preventDefault();
-    setSending(true);
-    try {
-      await marketAPI.enquire(selectedListing.id, enquiry);
-      alert('Your enquiry has been sent to the farmer!');
-      setSelectedListing(null);
-      setEnquiry('');
-    } catch (err) {
-      alert('Failed to send enquiry.');
-    } finally {
-      setSending(false);
+  const [contactModalListing, setContactModalListing] = useState(null);
+  const [contactMessage, setContactMessage] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const openContactModal = (listing) => {
+    setContactModalListing(listing);
+    setContactMessage('');
+  };
+
+  const handleSendContact = async () => {
+    if (contactMessage && contactModalListing) {
+      setSending(true);
+      try {
+        await marketAPI.enquire(contactModalListing.id, contactMessage);
+        addToast("Your message has been sent to the seller!", 'success');
+        setContactModalListing(null);
+      } catch (err) {
+        console.error(err);
+        addToast("Failed to send message.", 'error');
+      } finally {
+        setSending(false);
+      }
     }
   };
 
   return (
-    <div className="animate-fade-in">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-6)' }}>
+      <div className="page-header" style={{ marginBottom: 0 }}>
         <div>
-          <h1 className="page-title">Agricultural Marketplace</h1>
-          <p className="page-subtitle">Connecting Volta Region farmers directly with institutional and retail buyers.</p>
+          <h1 className="page-title">Market Exchange</h1>
+          <p className="page-subtitle">Connect directly with verified buyers and sellers.</p>
         </div>
         {isFarmer && (
           <Link to="/market/new">
-            <Button icon={<Plus size={18} />}>Create Listing</Button>
+            <Button icon={<Plus size={18} />}>New Listing</Button>
           </Link>
         )}
       </div>
 
-      {/* Filters Bar */}
-      <Card style={{ marginBottom: 'var(--sp-8)', padding: 'var(--sp-4) var(--sp-6)' }}>
-        <div style={{ display: 'flex', gap: 'var(--sp-4)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div className="form-group" style={{ flex: 1, minWidth: 200 }}>
-            <label className="form-label">Crop Type</label>
-            <div style={{ position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <select 
-                className="form-input" 
-                style={{ paddingLeft: 36 }}
-                value={filters.crop_type}
-                onChange={e => setFilters(p => ({ ...p, crop_type: e.target.value }))}
-              >
-                <option value="">All Crops</option>
-                {CROPS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-              </select>
-            </div>
-          </div>
-          <div className="form-group" style={{ flex: 1, minWidth: 200 }}>
-            <label className="form-label">Location (Region)</label>
-            <div style={{ position: 'relative' }}>
-              <Filter size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <select 
-                className="form-input" 
-                style={{ paddingLeft: 36 }}
-                value={filters.region}
-                onChange={e => setFilters(p => ({ ...p, region: e.target.value }))}
-              >
-                <option value="">All Regions</option>
-                {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-              </select>
-            </div>
-          </div>
-          <Button variant="ghost" onClick={() => setFilters({ crop_type: '', region: '' })}>Reset</Button>
-        </div>
-      </Card>
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: 'var(--sp-3)', overflowX: 'auto', paddingBottom: 'var(--sp-2)' }}>
+        <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>All Crops</FilterButton>
+        <FilterButton active={filter === 'tomato'} onClick={() => setFilter('tomato')}>Tomatoes</FilterButton>
+        <FilterButton active={filter === 'maize'} onClick={() => setFilter('maize')}>Maize</FilterButton>
+        <FilterButton active={filter === 'pineapple'} onClick={() => setFilter('pineapple')}>Pineapples</FilterButton>
+      </div>
 
+      {/* Listings Grid */}
       {loading ? (
-        <div className="grid-auto">
-          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton" style={{ height: 320, borderRadius: 'var(--radius-lg)' }}></div>)}
+        <div className="grid-3">
+          {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 200, borderRadius: 'var(--radius-lg)' }}></div>)}
         </div>
       ) : listings.length === 0 ? (
-        <div className="empty-state glass">
-          <ShoppingBasket className="empty-state-icon" />
-          <h3 className="empty-state-title">No listings found</h3>
-          <p className="empty-state-desc">Try adjusting your filters or check back later for new produce listings.</p>
-        </div>
+        <Card style={{ textAlign: 'center', padding: 'var(--sp-12)' }}>
+          <ShoppingBasket size={48} style={{ color: 'var(--text-muted)', margin: '0 auto var(--sp-4)' }} />
+          <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--sp-2)' }}>No Listings Found</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>There are currently no active listings for this category.</p>
+        </Card>
       ) : (
-        <div className="grid-auto">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--sp-6)' }}>
           {listings.map(listing => (
-            <ListingCard 
-              key={listing.id} 
-              listing={listing} 
-              onEnquire={() => setSelectedListing(listing)} 
-            />
+            <Card key={listing.id} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', padding: 'var(--sp-5)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', gap: 'var(--sp-3)', alignItems: 'center' }}>
+                  <div style={{ 
+                    width: 40, height: 40, borderRadius: 'var(--radius-md)', 
+                    background: 'var(--accent-dim)', color: 'var(--accent)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}>
+                    {CROP_ICONS[listing.crop_type]}
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 600, textTransform: 'capitalize' }}>
+                      {listing.crop_type}
+                    </h3>
+                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+                      {listing.farmer_name}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent)' }}>
+                    GH₵ {Number(listing.asking_price_ghs).toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>per kg</div>
+                </div>
+              </div>
+
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.5, flex: 1 }}>
+                {listing.description}
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', padding: 'var(--sp-3)', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                  <Tag size={14} className="text-muted" /> 
+                  <span style={{ fontWeight: 600 }}>{listing.quantity_kg} kg</span> Available
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                  <Calendar size={14} className="text-muted" /> 
+                  Harvest: <span style={{ fontWeight: 500 }}>{new Date(listing.harvest_date).toLocaleDateString()}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-2)', fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                  <MapPin size={14} className="text-muted" /> 
+                  {listing.farmer_district}, {listing.farmer_region}
+                </div>
+              </div>
+
+              <div style={{ marginTop: 'var(--sp-2)' }}>
+                <Button 
+                  fullWidth 
+                  variant="primary" 
+                  icon={<MessageCircle size={16} />}
+                  onClick={() => openContactModal(listing)}
+                >
+                  Contact Seller
+                </Button>
+              </div>
+            </Card>
           ))}
         </div>
       )}
 
-      {/* Enquiry Modal */}
+      {/* Contact Seller Modal */}
       <Modal 
-        open={!!selectedListing} 
-        onClose={() => setSelectedListing(null)}
-        title="Contact Farmer"
+        open={!!contactModalListing} 
+        onClose={() => setContactModalListing(null)}
+        title="Contact Seller"
+        width={400}
       >
-        {selectedListing && (
-          <form onSubmit={handleEnquire} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-5)' }}>
-            <div style={{ padding: 'var(--sp-4)', background: 'var(--accent-dim)', borderRadius: 'var(--radius-md)', border: '1px solid rgba(74, 222, 128, 0.2)' }}>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>{selectedListing.crop_type.toUpperCase()} - {selectedListing.quantity_kg}kg</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Farmer: {selectedListing.farmer_name}</div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Your Message</label>
-              <textarea 
-                className="form-input" 
-                rows={4} 
-                placeholder="Ask about availability, delivery, or negotiate price..."
-                value={enquiry}
-                onChange={e => setEnquiry(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" fullWidth icon={<Send size={18} />} loading={sending}>
-              Send Enquiry
-            </Button>
-          </form>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+            Send a message to <strong>{contactModalListing?.farmer_name}</strong> about their {contactModalListing?.crop_type} listing.
+          </p>
+          <textarea 
+            value={contactMessage}
+            onChange={e => setContactMessage(e.target.value)}
+            style={{
+              width: '100%', padding: 'var(--sp-3)',
+              background: 'var(--bg-input)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)', color: 'var(--text-primary)',
+              outline: 'none', minHeight: 100, resize: 'vertical',
+              fontFamily: 'inherit', fontSize: '0.875rem'
+            }}
+            placeholder="Type your message here..."
+            autoFocus
+          />
+          <div style={{ display: 'flex', gap: 'var(--sp-3)', justifyContent: 'flex-end', marginTop: 'var(--sp-2)' }}>
+            <Button variant="ghost" onClick={() => setContactModalListing(null)} disabled={sending}>Cancel</Button>
+            <Button variant="primary" onClick={handleSendContact} loading={sending}>Send Message</Button>
+          </div>
+        </div>
       </Modal>
     </div>
+  );
+}
+
+function FilterButton({ children, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '8px 16px',
+        borderRadius: 'var(--radius-full)',
+        background: active ? 'var(--accent)' : 'var(--bg-input)',
+        color: active ? '#0a1410' : 'var(--text-secondary)',
+        border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
+        fontSize: '0.875rem',
+        fontWeight: 600,
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      {children}
+    </button>
   );
 }

@@ -1,5 +1,8 @@
 // ─── Mock Data for AgroWatch ────────────────────────────────────────────────
 // Replace with real API calls when backend is ready (set VITE_USE_MOCK=false)
+import React from 'react';
+import { Apple, Wheat, Citrus } from 'lucide-react';
+
 
 export const CROPS = ['tomato', 'maize', 'pineapple'];
 
@@ -331,9 +334,9 @@ export const MOCK_LISTINGS = [
 ];
 
 export const CROP_ICONS = {
-  tomato: '🍅',
-  maize: '🌽',
-  pineapple: '🍍',
+  tomato: React.createElement(Apple, { size: 24 }),
+  maize: React.createElement(Wheat, { size: 24 }),
+  pineapple: React.createElement(Citrus, { size: 24 }),
 };
 
 export const CROP_COLORS = {

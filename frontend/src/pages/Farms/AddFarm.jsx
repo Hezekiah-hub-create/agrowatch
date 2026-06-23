@@ -1,117 +1,154 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { farmsAPI } from '../../services/api';
+import { ArrowLeft, Save } from 'lucide-react';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
-import { Tractor, MapPin, Maximize, Save, X } from 'lucide-react';
+import Select from '../../components/UI/Select';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { farmsAPI } from '../../services/api';
 import { CROPS, REGIONS, DISTRICTS } from '../../data/mockData';
 
 export default function AddFarm() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addToast } = useToast();
+  
   const [formData, setFormData] = useState({
     farm_name: '',
-    crop_type: 'tomato',
-    region: 'Volta Region',
-    district: 'Ho',
+    crop_type: '',
+    region: '',
+    district: '',
     area_ha: ''
   });
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (!formData.crop_type || !formData.region || !formData.district) return;
+    
+    setIsSubmitting(true);
     try {
       await farmsAPI.create({
         ...formData,
-        area_ha: parseFloat(formData.area_ha)
+        farmer_id: user?.id,
+        area_ha: Number(formData.area_ha)
       });
+      addToast('Farm registered successfully!', 'success');
       navigate('/farms');
     } catch (err) {
-      alert('Failed to register farm.');
+      console.error(err);
+      addToast('Failed to register farm', 'error');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: 600, margin: '0 auto' }}>
-      <div className="page-header">
-        <h1 className="page-title">Register New Farm</h1>
-        <p className="page-subtitle">Provide details about your field plot for accurate monitoring.</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-4)', marginBottom: 'var(--sp-6)' }}>
+        <button 
+          onClick={() => navigate('/farms')}
+          style={{ 
+            background: 'var(--bg-input)', border: '1px solid var(--border)', 
+            width: 36, height: 36, borderRadius: 'var(--radius-md)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--text-secondary)', cursor: 'pointer'
+          }}
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="page-title" style={{ margin: 0 }}>Register New Farm</h1>
+          <p className="page-subtitle" style={{ margin: '4px 0 0' }}>Add a new plot to start monitoring its health.</p>
+        </div>
       </div>
 
-      <Card style={{ padding: 'var(--sp-8)' }}>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-6)' }}>
-          <div className="form-group">
-            <label className="form-label">Farm Name</label>
-            <div style={{ position: 'relative' }}>
-              <Tractor size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <input 
-                name="farm_name" 
-                className="form-input" 
-                placeholder="e.g. Riverside Tomato Plot" 
-                style={{ paddingLeft: 44 }} 
-                value={formData.farm_name} 
-                onChange={handleChange} 
-                required 
+      <Card>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-5)' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--sp-2)', fontWeight: 500, fontSize: '0.875rem' }}>Farm / Plot Name</label>
+            <input 
+              type="text" 
+              name="farm_name" 
+              value={formData.farm_name} 
+              onChange={handleChange}
+              placeholder="e.g. North Field"
+              required
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <Select 
+              label="Crop Type"
+              value={formData.crop_type}
+              onChange={(val) => setFormData(prev => ({ ...prev, crop_type: val }))}
+              options={CROPS.map(crop => ({ value: crop, label: crop.charAt(0).toUpperCase() + crop.slice(1) }))}
+              placeholder="Select crop type"
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
+            <div>
+              <Select 
+                label="Region"
+                value={formData.region}
+                onChange={(val) => setFormData(prev => ({ ...prev, region: val }))}
+                options={REGIONS.map(r => ({ value: r, label: r }))}
+                placeholder="Select region"
+              />
+            </div>
+            <div>
+              <Select 
+                label="District"
+                value={formData.district}
+                onChange={(val) => setFormData(prev => ({ ...prev, district: val }))}
+                options={DISTRICTS.map(d => ({ value: d, label: d }))}
+                placeholder="Select district"
               />
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
-            <div className="form-group">
-              <label className="form-label">Main Crop Type</label>
-              <select name="crop_type" className="form-input" value={formData.crop_type} onChange={handleChange}>
-                {CROPS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Area (Hectares)</label>
-              <div style={{ position: 'relative' }}>
-                <Maximize size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                <input 
-                  name="area_ha" 
-                  type="number" 
-                  step="0.1" 
-                  className="form-input" 
-                  placeholder="e.g. 1.5" 
-                  style={{ paddingLeft: 44 }} 
-                  value={formData.area_ha} 
-                  onChange={handleChange} 
-                  required 
-                />
-              </div>
-            </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--sp-2)', fontWeight: 500, fontSize: '0.875rem' }}>Area (Hectares)</label>
+            <input 
+              type="number" 
+              name="area_ha" 
+              value={formData.area_ha} 
+              onChange={handleChange}
+              placeholder="e.g. 1.5"
+              step="0.1"
+              min="0.1"
+              required
+              style={inputStyle}
+            />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp-4)' }}>
-            <div className="form-group">
-              <label className="form-label">Region</label>
-              <div style={{ position: 'relative' }}>
-                <MapPin size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', zIndex: 1 }} />
-                <select name="region" className="form-input" style={{ paddingLeft: 44 }} value={formData.region} onChange={handleChange}>
-                  {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">District</label>
-              <select name="district" className="form-input" value={formData.district} onChange={handleChange}>
-                {DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 'var(--sp-4)', marginTop: 'var(--sp-4)' }}>
-            <Button variant="ghost" fullWidth icon={<X size={18} />} onClick={() => navigate('/farms')}>Cancel</Button>
-            <Button type="submit" fullWidth icon={<Save size={18} />} loading={loading}>Save Farm Record</Button>
+          <div style={{ marginTop: 'var(--sp-2)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--sp-3)' }}>
+            <Button type="button" variant="ghost" onClick={() => navigate('/farms')} disabled={isSubmitting}>Cancel</Button>
+            <Button type="submit" variant="primary" icon={<Save size={18} />} loading={isSubmitting}>Register Farm</Button>
           </div>
         </form>
       </Card>
     </div>
   );
 }
+
+const inputStyle = {
+  width: '100%', 
+  padding: 'var(--sp-3)',
+  background: 'var(--bg-input)', 
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius-md)', 
+  color: 'var(--text-primary)',
+  outline: 'none',
+  fontSize: '0.9rem',
+  fontFamily: 'inherit'
+};

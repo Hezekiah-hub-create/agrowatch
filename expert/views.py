@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import DiseaseCondition
+from .serializers import DiseaseConditionSerializer
 
-# Create your views here.
+class DiseaseConditionViewSet(viewsets.ModelViewSet):
+    queryset = DiseaseCondition.objects.all()
+    serializer_class = DiseaseConditionSerializer
+    lookup_field = 'condition_id'

@@ -26,8 +26,8 @@
   --text-secondary:#4b554e;
   --text-muted:    #94a39a;
 
-  --glass-bg:      rgba(255, 255, 255, 0.6);
-  --glass-strong-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg:      rgba(255, 255, 255, 0.95);
+  --glass-strong-bg: #ffffff;
 
   /* Global Props */
   --sp-1: 0.25rem;
@@ -78,8 +78,8 @@
   --text-secondary:#8fad95;
   --text-muted:    #4a6650;
 
-  --glass-bg:      rgba(22, 42, 30, 0.6);
-  --glass-strong-bg: rgba(26, 46, 31, 0.85);
+  --glass-bg:      rgba(17, 32, 23, 0.95);
+  --glass-strong-bg: #112017;
 
   --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
   --shadow-md:  0 4px 16px rgba(0,0,0,0.4);
@@ -158,8 +158,8 @@ html {
 
 .glass-strong {
   background: var(--glass-strong-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(80px);
+  -webkit-backdrop-filter: blur(80px);
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-lg);
 }
@@ -310,8 +310,8 @@ select.form-input option {
 }
 
 .page-content {
-  padding: var(--sp-8);
-  max-width: 1280px;
+  padding: var(--sp-6);
+  max-width: 1600px;
 }
 
 .page-header {
@@ -370,7 +370,7 @@ select.form-input option {
 .dashboard-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: var(--sp-8);
+  gap: var(--sp-6);
 }
 
 @media (max-width: 1024px) {
@@ -522,4 +522,22 @@ select.form-input option {
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .topbar-menu-btn { display: flex !important; }
+}
+/* ─── Mini Select (for Calendar Header) ───────────────────────────── */
+.mini-select {
+  gap: 0 !important;
+}
+.mini-select > div:nth-child(1) {
+  padding: 4px 6px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.mini-select > div:nth-child(1):hover {
+  background: var(--bg-card-hover) !important;
+}
+.mini-select .form-label {
+  display: none;
 }

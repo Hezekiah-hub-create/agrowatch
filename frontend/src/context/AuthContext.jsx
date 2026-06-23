@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { MOCK_USERS } from '../data/mockData';
+import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -16,31 +17,20 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  /** Mock login — finds user by phone */
   const login = async (phone, password) => {
-    await delay(600);
-    // Find user by phone in mock data (fallback to farmer if not found)
-    const mockUser = Object.values(MOCK_USERS).find(u => u.phone_number === phone) || MOCK_USERS.farmer;
-    const sessionUser = { ...mockUser, token: 'mock-jwt-token-xyz' };
+    const { user, token } = await authAPI.login(phone, password, 'farmer'); // role can be passed dynamically if needed
+    const sessionUser = { ...user, token: token || 'mock-jwt-token-xyz' };
     setUser(sessionUser);
     localStorage.setItem('agrowatch_user', JSON.stringify(sessionUser));
     return sessionUser;
   };
 
   const register = async (data) => {
-    await delay(800);
-    const newUser = {
-      id: Date.now(),
-      full_name: data.full_name,
-      phone_number: data.phone_number,
-      user_role: data.role,
-      region: data.region,
-      district: data.district,
-      token: 'mock-jwt-token-xyz',
-    };
-    setUser(newUser);
-    localStorage.setItem('agrowatch_user', JSON.stringify(newUser));
-    return newUser;
+    const { user, token } = await authAPI.register(data);
+    const sessionUser = { ...user, token: token || 'mock-jwt-token-xyz' };
+    setUser(sessionUser);
+    localStorage.setItem('agrowatch_user', JSON.stringify(sessionUser));
+    return sessionUser;
   };
 
   const logout = () => {

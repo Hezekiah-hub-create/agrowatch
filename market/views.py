@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from .models import MarketListing
+from .serializers import MarketListingSerializer
 
-# Create your views here.
+class MarketListingViewSet(viewsets.ModelViewSet):
+    queryset = MarketListing.objects.all().order_by('-created_at')
+    serializer_class = MarketListingSerializer
