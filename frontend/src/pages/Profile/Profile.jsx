@@ -1,8 +1,14 @@
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
-import { User, Phone, MapPin, Shield, Edit2, LogOut } from 'lucide-react';
+import Modal from '../../components/UI/Modal';
+import Select from '../../components/UI/Select';
+import { Phone, MapPin, Shield, Edit2, LogOut, Save } from 'lucide-react';
+import { authAPI } from '../../services/api';
+import { REGIONS } from '../../data/constants';
 
 const getInitials = (name) => {
   if (!name) return '?';
@@ -13,9 +19,45 @@ const getInitials = (name) => {
 };
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
+  const { addToast } = useToast();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone_number: '',
+    region: '',
+    district: ''
+  });
+  const [saving, setSaving] = useState(false);
 
   if (!user) return null;
+
+  const openEditModal = () => {
+    setFormData({
+      full_name: user.full_name || '',
+      phone_number: user.phone_number || '',
+      region: user.region || '',
+      district: user.district || ''
+    });
+    setIsEditing(true);
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const updatedData = await authAPI.updateProfile(user.id, formData);
+      updateUser(updatedData);
+      addToast('Profile updated successfully!', 'success');
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      addToast('Failed to update profile.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -41,7 +83,9 @@ export default function Profile() {
             <h2 style={{ fontSize: '1.25rem', marginBottom: 4 }}>{user.full_name}</h2>
             <Badge label={user.user_role} variant="accent" dot />
             <div style={{ marginTop: 'var(--sp-8)' }}>
-              <Button variant="ghost" fullWidth icon={<Edit2 size={16} />}>Edit Profile</Button>
+              <Button variant="ghost" fullWidth icon={<Edit2 size={16} />} onClick={openEditModal}>
+                Edit Profile
+              </Button>
             </div>
           </Card>
 
@@ -54,8 +98,8 @@ export default function Profile() {
             <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--sp-6)' }}>Account Details</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-6)' }}>
               <DetailItem icon={<Phone size={20} />} label="Phone Number" value={user.phone_number} />
-              <DetailItem icon={<MapPin size={20} />} label="Region" value={user.region} />
-              <DetailItem icon={<Shield size={20} />} label="Identity Status" value="Verified Farmer" status="accent" />
+              <DetailItem icon={<MapPin size={20} />} label="Region & District" value={`${user.district ? user.district + ', ' : ''}${user.region}`} />
+              <DetailItem icon={<Shield size={20} />} label="Identity Status" value={`Verified ${user.user_role ? user.user_role.charAt(0).toUpperCase() + user.user_role.slice(1) : 'User'}`} status="accent" />
             </div>
           </Card>
 
@@ -74,6 +118,56 @@ export default function Profile() {
           </Card>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <Modal open={isEditing} onClose={() => setIsEditing(false)} title="Edit Profile" width={480}>
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--sp-2)', fontWeight: 500, fontSize: '0.875rem' }}>Full Name</label>
+            <input 
+              type="text" 
+              value={formData.full_name} 
+              onChange={e => setFormData(p => ({ ...p, full_name: e.target.value }))}
+              style={inputStyle}
+              required
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--sp-2)', fontWeight: 500, fontSize: '0.875rem' }}>Phone Number</label>
+            <input 
+              type="text" 
+              value={formData.phone_number} 
+              onChange={e => setFormData(p => ({ ...p, phone_number: e.target.value }))}
+              style={inputStyle}
+              required
+            />
+          </div>
+
+          <Select 
+            label="Region"
+            options={REGIONS}
+            value={formData.region}
+            onChange={(val) => setFormData(p => ({ ...p, region: val }))}
+          />
+
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--sp-2)', fontWeight: 500, fontSize: '0.875rem' }}>District</label>
+            <input 
+              type="text" 
+              value={formData.district} 
+              onChange={e => setFormData(p => ({ ...p, district: e.target.value }))}
+              style={inputStyle}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 'var(--sp-3)', justifyContent: 'flex-end', marginTop: 'var(--sp-4)' }}>
+            <Button type="button" variant="ghost" onClick={() => setIsEditing(false)} disabled={saving}>Cancel</Button>
+            <Button type="submit" variant="primary" icon={<Save size={16} />} loading={saving}>Save Changes</Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
@@ -90,3 +184,15 @@ function DetailItem({ icon, label, value, status }) {
     </div>
   );
 }
+
+const inputStyle = {
+  width: '100%', 
+  padding: 'var(--sp-3)',
+  background: 'var(--bg-input)', 
+  border: '1px solid var(--border)',
+  borderRadius: 'var(--radius-md)', 
+  color: 'var(--text-primary)',
+  outline: 'none',
+  fontSize: '0.9rem',
+  fontFamily: 'inherit'
+};

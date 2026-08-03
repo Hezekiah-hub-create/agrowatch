@@ -7,7 +7,7 @@ import Badge from '../../components/UI/Badge';
 import { useToast } from '../../context/ToastContext';
 import { Tractor, MapPin, Maximize, Plus, ArrowRight, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { CROP_ICONS } from '../../data/mockData';
+import { CROP_ICONS } from '../../data/constants';
 
 export default function Farms() {
   const [farms, setFarms] = useState([]);

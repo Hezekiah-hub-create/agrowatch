@@ -5,7 +5,7 @@ import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
 import { scansAPI } from '../../services/api';
-import { CROP_ICONS, DISEASE_CONDITIONS } from '../../data/mockData';
+import { CROP_ICONS, DISEASE_CONDITIONS } from '../../data/constants';
 
 export default function ScanResults() {
   const { scanId } = useParams();

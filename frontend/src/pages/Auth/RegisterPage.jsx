@@ -6,7 +6,7 @@ import Button from '../../components/UI/Button';
 import Card from '../../components/UI/Card';
 import Select from '../../components/UI/Select';
 import { Leaf, User, Phone, Lock, MapPin, ChevronLeft } from 'lucide-react';
-import { REGIONS } from '../../data/mockData';
+import { REGIONS } from '../../data/constants';
 import authBg from '../../assets/auth_bg.png';
 
 export default function RegisterPage() {

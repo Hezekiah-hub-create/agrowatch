@@ -8,7 +8,7 @@ import Badge from '../../components/UI/Badge';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { marketAPI } from '../../services/api';
-import { CROP_ICONS } from '../../data/mockData';
+import { CROP_ICONS } from '../../data/constants';
 
 export default function MarketListings() {
   const { isFarmer } = useAuth();

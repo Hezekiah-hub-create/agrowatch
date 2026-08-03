@@ -6,7 +6,7 @@ import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
 import { farmsAPI, scansAPI, marketAPI } from '../../services/api';
-import { CROP_ICONS } from '../../data/mockData';
+import { CROP_ICONS } from '../../data/constants';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -29,8 +29,10 @@ export default function Dashboard() {
           marketAPI.list()
         ]);
 
-        const userListings = allListings.filter(l => l.farmer_id === user?.id && l.listing_status === 'active');
-        const sortedScans = [...allScans].sort((a, b) => new Date(b.scan_date) - new Date(a.scan_date));
+        const userFarmIds = new Set(userFarms.map(f => f.id));
+        const userScans = allScans.filter(s => userFarmIds.has(s.farm) || userFarmIds.has(s.farm_id));
+        const userListings = allListings.filter(l => (l.farmer === user?.id || l.farmer_id === user?.id) && l.listing_status === 'active');
+        const sortedScans = [...userScans].sort((a, b) => new Date(b.scan_date) - new Date(a.scan_date));
         const alerts = sortedScans.reduce((acc, scan) => acc + (scan.disease_flags > 0 ? 1 : 0), 0);
 
         setStats({

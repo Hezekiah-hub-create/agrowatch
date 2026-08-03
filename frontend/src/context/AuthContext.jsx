@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { MOCK_USERS } from '../data/mockData';
 import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -18,8 +17,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (phone, password) => {
-    const { user, token } = await authAPI.login(phone, password, 'farmer'); // role can be passed dynamically if needed
-    const sessionUser = { ...user, token: token || 'mock-jwt-token-xyz' };
+    const { user, token } = await authAPI.login(phone, password);
+    const sessionUser = { ...user, token };
     setUser(sessionUser);
     localStorage.setItem('agrowatch_user', JSON.stringify(sessionUser));
     return sessionUser;
@@ -27,7 +26,7 @@ export function AuthProvider({ children }) {
 
   const register = async (data) => {
     const { user, token } = await authAPI.register(data);
-    const sessionUser = { ...user, token: token || 'mock-jwt-token-xyz' };
+    const sessionUser = { ...user, token };
     setUser(sessionUser);
     localStorage.setItem('agrowatch_user', JSON.stringify(sessionUser));
     return sessionUser;
@@ -38,12 +37,18 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('agrowatch_user');
   };
 
+  const updateUser = (updatedFields) => {
+    const updatedUser = { ...user, ...updatedFields };
+    setUser(updatedUser);
+    localStorage.setItem('agrowatch_user', JSON.stringify(updatedUser));
+  };
+
   const isFarmer = user?.user_role === 'farmer';
   const isBuyer  = user?.user_role === 'buyer';
   const isAdmin  = user?.user_role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isFarmer, isBuyer, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, isFarmer, isBuyer, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
@@ -54,6 +59,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 }
-
-// Utility
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));

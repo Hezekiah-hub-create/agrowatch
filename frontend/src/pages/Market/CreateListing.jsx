@@ -8,7 +8,7 @@ import DatePicker from '../../components/UI/DatePicker';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { marketAPI } from '../../services/api';
-import { CROPS } from '../../data/mockData';
+import { CROPS } from '../../data/constants';
 
 export default function CreateListing() {
   const navigate = useNavigate();

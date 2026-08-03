@@ -7,7 +7,7 @@ import Select from '../../components/UI/Select';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { farmsAPI } from '../../services/api';
-import { CROPS, REGIONS, DISTRICTS } from '../../data/mockData';
+import { CROPS, REGIONS, DISTRICTS } from '../../data/constants';
 
 export default function AddFarm() {
   const navigate = useNavigate();

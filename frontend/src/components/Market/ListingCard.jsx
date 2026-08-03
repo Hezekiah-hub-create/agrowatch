@@ -1,7 +1,7 @@
 import Card from '../UI/Card';
 import Button from '../UI/Button';
 import Badge from '../UI/Badge';
-import { CROP_ICONS, CROP_COLORS } from '../../data/mockData';
+import { CROP_ICONS, CROP_COLORS } from '../../data/constants';
 import { MapPin, Calendar, ShoppingCart } from 'lucide-react';
 
 export default function ListingCard({ listing, onEnquire }) {
