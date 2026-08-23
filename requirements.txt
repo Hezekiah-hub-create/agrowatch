@@ -1,0 +1,8 @@
+django>=5.0,<6.1
+djangorestframework
+django-cors-headers
+pillow
+ultralytics
+opencv-python-headless
+gunicorn
+whitenoise
