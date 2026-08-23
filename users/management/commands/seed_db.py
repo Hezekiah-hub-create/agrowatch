@@ -15,7 +15,9 @@ class Command(BaseCommand):
 
         # 1. Create Superuser
         if not User.objects.filter(username='admin').exists():
-            User.objects.create_superuser('admin', 'admin@example.com', 'admin', phone_number='admin')
+            admin_user = User.objects.create_superuser('admin', 'admin@example.com', 'admin', phone_number='admin', user_role='admin')
+            admin_user.user_role = 'admin'
+            admin_user.save()
             self.stdout.write("Created superuser: admin")
 
         # 2. Create Users
