@@ -6,7 +6,7 @@ import Button from '../../components/UI/Button';
 import Card from '../../components/UI/Card';
 import Select from '../../components/UI/Select';
 import { Leaf, User, Phone, Lock, MapPin, ChevronLeft } from 'lucide-react';
-import { REGIONS } from '../../data/constants';
+import { REGIONS, REGIONS_DISTRICTS } from '../../data/constants';
 import authBg from '../../assets/auth_bg.png';
 
 export default function RegisterPage() {
@@ -15,7 +15,7 @@ export default function RegisterPage() {
     phone_number: '',
     password: '',
     role: 'farmer',
-    region: 'Volta Region',
+    region: '',
     district: ''
   });
   const [loading, setLoading] = useState(false);
@@ -27,8 +27,12 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await register(formData);
-      navigate('/dashboard');
+      const user = await register(formData);
+      if (user?.user_role === 'admin' || user?.role === 'admin' || formData.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       addToast('Registration failed.', 'error');
     } finally {
@@ -126,15 +130,20 @@ export default function RegisterPage() {
             <Select 
               label="Region"
               icon={MapPin}
-              options={REGIONS}
+              options={REGIONS.map(r => ({ value: r, label: r }))}
               value={formData.region}
-              onChange={(val) => setFormData(p => ({...p, region: val}))}
+              onChange={(val) => setFormData(p => ({...p, region: val, district: ''}))}
+              placeholder="Select region"
             />
 
-            <div className="form-group">
-              <label className="form-label" style={{ color: 'var(--text-primary)' }}>District</label>
-              <input name="district" className="form-input" placeholder="e.g. Ho" value={formData.district} onChange={handleChange} required />
-            </div>
+            <Select
+              label="District"
+              options={(REGIONS_DISTRICTS[formData.region] || []).map(d => ({ value: d, label: d }))}
+              value={formData.district}
+              onChange={(val) => setFormData(p => ({...p, district: val}))}
+              placeholder={formData.region ? 'Select district' : 'Select a region first'}
+              disabled={!formData.region}
+            />
 
             <div style={{ gridColumn: 'span 2', marginTop: 'var(--sp-2)' }}>
               <Button type="submit" fullWidth size="lg" loading={loading}>

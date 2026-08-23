@@ -60,25 +60,19 @@ export default function NewScan() {
 
     try {
       const farm = userFarms.find(f => f.id === selectedFarm);
-      const payload = {
-        farm: selectedFarm,
-        crop_type: farm ? farm.crop_type : 'tomato',
-        image_count: files.length,
-        status: 'completed',
-        total_plants: Math.floor(150 + Math.random() * 400),
-        disease_flags: Math.floor(5 + Math.random() * 40),
-        precision: 0.87,
-        recall: 0.83,
-        f1_score: 0.85,
-        mota: 0.78,
-        identity_switches: 16
-      };
+      const crop = farm ? farm.crop_type : 'tomato';
 
-      const newScan = await scansAPI.create(payload);
-      
+      // Build FormData to send real image files to the backend for YOLOv8 inference
+      const formData = new FormData();
+      formData.append('farm', selectedFarm);
+      formData.append('crop_type', crop);
+      files.forEach(file => formData.append('images', file));
+
+      const newScan = await scansAPI.create(formData);
+
       clearInterval(interval);
       setProgress(100);
-      
+
       setTimeout(() => {
         navigate(`/scan/${newScan.id}`);
       }, 500);
@@ -177,7 +171,7 @@ export default function NewScan() {
                     borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)', overflow: 'hidden' }}>
-                      <ImageIcon size={16} className="text-accent" flexShrink={0} />
+                      <ImageIcon size={16} className="text-accent" style={{ flexShrink: 0 }} />
                       <span style={{ fontSize: '0.8125rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {file.name}
                       </span>

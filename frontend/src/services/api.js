@@ -19,6 +19,16 @@ http.interceptors.request.use((cfg) => {
   return cfg;
 });
 
+export default http;
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+export const usersAPI = {
+  list: async () => {
+    const { data } = await http.get('/users/');
+    return data;
+  },
+};
+
 // ── Auth ─────────────────────────────────────────────────────────────────────
 export const authAPI = {
   login: async (phone_number, password) => {
@@ -77,8 +87,12 @@ export const scansAPI = {
     const { data } = await http.get(`/scans/${id}/`);
     return data;
   },
-  create: async (payload) => {
-    const { data } = await http.post('/scans/', payload);
+  create: async (formDataOrPayload) => {
+    // Accept both FormData (real upload) and plain objects (simulated)
+    const isFormData = formDataOrPayload instanceof FormData;
+    const { data } = await http.post('/scans/', formDataOrPayload, {
+      headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
+    });
     return data;
   },
 };
@@ -107,6 +121,41 @@ export const expertAPI = {
   },
   getCondition: async (conditionId) => {
     const { data } = await http.get(`/expert/conditions/${conditionId}/`);
+    return data;
+  },
+};
+
+// ── Messaging ─────────────────────────────────────────────────────────────────
+export const messagingAPI = {
+  // Threads
+  listThreads: async () => {
+    const { data } = await http.get('/messages/threads/');
+    return data;
+  },
+  startThread: async (payload) => {
+    // payload: { seller, listing (optional), initial_message }
+    const { data } = await http.post('/messages/threads/', payload);
+    return data;
+  },
+  getMessages: async (threadId) => {
+    const { data } = await http.get(`/messages/threads/${threadId}/messages/`);
+    return data;
+  },
+  reply: async (threadId, body) => {
+    const { data } = await http.post(`/messages/threads/${threadId}/reply/`, { body });
+    return data;
+  },
+  // Notifications
+  listNotifications: async () => {
+    const { data } = await http.get('/messages/notifications/');
+    return data;
+  },
+  markNotifRead: async (id) => {
+    const { data } = await http.post(`/messages/notifications/${id}/mark_read/`);
+    return data;
+  },
+  markAllNotifsRead: async () => {
+    const { data } = await http.post('/messages/notifications/mark_all_read/');
     return data;
   },
 };

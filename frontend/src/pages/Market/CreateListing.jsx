@@ -38,6 +38,7 @@ export default function CreateListing() {
     try {
       await marketAPI.create({
         ...formData,
+        farmer: user?.id,
         quantity_kg: Number(formData.quantity_kg),
         asking_price_ghs: Number(formData.asking_price_ghs)
       });

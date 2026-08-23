@@ -7,7 +7,7 @@ import Select from '../../components/UI/Select';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { farmsAPI } from '../../services/api';
-import { CROPS, REGIONS, DISTRICTS } from '../../data/constants';
+import { CROPS, REGIONS, REGIONS_DISTRICTS } from '../../data/constants';
 
 export default function AddFarm() {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function AddFarm() {
     try {
       await farmsAPI.create({
         ...formData,
-        farmer_id: user?.id,
+        farmer: user?.id,
         area_ha: Number(formData.area_ha)
       });
       addToast('Farm registered successfully!', 'success');
@@ -100,7 +100,7 @@ export default function AddFarm() {
               <Select 
                 label="Region"
                 value={formData.region}
-                onChange={(val) => setFormData(prev => ({ ...prev, region: val }))}
+                onChange={(val) => setFormData(prev => ({ ...prev, region: val, district: '' }))}
                 options={REGIONS.map(r => ({ value: r, label: r }))}
                 placeholder="Select region"
               />
@@ -110,8 +110,9 @@ export default function AddFarm() {
                 label="District"
                 value={formData.district}
                 onChange={(val) => setFormData(prev => ({ ...prev, district: val }))}
-                options={DISTRICTS.map(d => ({ value: d, label: d }))}
-                placeholder="Select district"
+                options={(REGIONS_DISTRICTS[formData.region] || []).map(d => ({ value: d, label: d }))}
+                placeholder={formData.region ? 'Select district' : 'Select a region first'}
+                disabled={!formData.region}
               />
             </div>
           </div>

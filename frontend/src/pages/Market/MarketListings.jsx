@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBasket, Plus, MapPin, Tag, Calendar, MessageCircle, Filter } from 'lucide-react';
 import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
@@ -7,12 +7,13 @@ import Modal from '../../components/UI/Modal';
 import Badge from '../../components/UI/Badge';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { marketAPI } from '../../services/api';
+import { marketAPI, messagingAPI } from '../../services/api';
 import { CROP_ICONS } from '../../data/constants';
 
 export default function MarketListings() {
-  const { isFarmer } = useAuth();
+  const { isFarmer, user } = useAuth();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const [listings, setListings] = useState([]);
   const [filter, setFilter] = useState('all');
 
@@ -24,8 +25,11 @@ export default function MarketListings() {
       try {
         const filters = filter !== 'all' ? { crop_type: filter } : {};
         const results = await marketAPI.list(filters);
-        // Ensure only active listings
-        setListings(results.filter(l => l.listing_status === 'active'));
+        let active = results.filter(l => l.listing_status === 'active');
+        if (isFarmer && user) {
+          active = active.filter(l => l.farmer === user.id || l.farmer_id === user.id || l.farmer_name === user.full_name);
+        }
+        setListings(active);
       } catch (err) {
         console.error(err);
       } finally {
@@ -33,7 +37,7 @@ export default function MarketListings() {
       }
     }
     loadListings();
-  }, [filter]);
+  }, [filter, isFarmer, user]);
 
   const [contactModalListing, setContactModalListing] = useState(null);
   const [contactMessage, setContactMessage] = useState('');
@@ -45,18 +49,22 @@ export default function MarketListings() {
   };
 
   const handleSendContact = async () => {
-    if (contactMessage && contactModalListing) {
-      setSending(true);
-      try {
-        await marketAPI.enquire(contactModalListing.id, contactMessage);
-        addToast("Your message has been sent to the seller!", 'success');
-        setContactModalListing(null);
-      } catch (err) {
-        console.error(err);
-        addToast("Failed to send message.", 'error');
-      } finally {
-        setSending(false);
-      }
+    if (!contactMessage.trim() || !contactModalListing) return;
+    setSending(true);
+    try {
+      const thread = await messagingAPI.startThread({
+        seller: contactModalListing.farmer,
+        listing: contactModalListing.id,
+        initial_message: contactMessage,
+      });
+      addToast("Message sent! The seller has been notified.", 'success');
+      setContactModalListing(null);
+      navigate(`/messages?thread=${thread.id}`);
+    } catch (err) {
+      console.error(err);
+      addToast("Failed to send message.", 'error');
+    } finally {
+      setSending(false);
     }
   };
 
@@ -64,8 +72,12 @@ export default function MarketListings() {
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-6)' }}>
       <div className="page-header" style={{ marginBottom: 0 }}>
         <div>
-          <h1 className="page-title">Market Exchange</h1>
-          <p className="page-subtitle">Connect directly with verified buyers and sellers.</p>
+          <h1 className="page-title">{isFarmer ? 'My Market Listings' : 'Market Exchange'}</h1>
+          <p className="page-subtitle">
+            {isFarmer 
+              ? 'Manage your active produce listings on the exchange.' 
+              : 'Connect directly with verified farmers and purchase produce.'}
+          </p>
         </div>
         {isFarmer && (
           <Link to="/market/new">
@@ -90,8 +102,19 @@ export default function MarketListings() {
       ) : listings.length === 0 ? (
         <Card style={{ textAlign: 'center', padding: 'var(--sp-12)' }}>
           <ShoppingBasket size={48} style={{ color: 'var(--text-muted)', margin: '0 auto var(--sp-4)' }} />
-          <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--sp-2)' }}>No Listings Found</h3>
-          <p style={{ color: 'var(--text-secondary)' }}>There are currently no active listings for this category.</p>
+          <h3 style={{ fontSize: '1.125rem', marginBottom: 'var(--sp-2)' }}>
+            {isFarmer ? 'No Products Listed' : 'No Listings Found'}
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: isFarmer ? 'var(--sp-4)' : 0 }}>
+            {isFarmer 
+              ? "You haven't listed any produce for sale yet." 
+              : "There are currently no active listings for this category."}
+          </p>
+          {isFarmer && (
+            <Link to="/market/new">
+              <Button icon={<Plus size={16} />}>List Produce for Sale</Button>
+            </Link>
+          )}
         </Card>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--sp-6)' }}>
@@ -111,7 +134,7 @@ export default function MarketListings() {
                       {listing.crop_type}
                     </h3>
                     <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-                      {listing.farmer_name}
+                      {listing.farmer_name} · {listing.farmer_phone}
                     </div>
                   </div>
                 </div>

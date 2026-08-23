@@ -23,7 +23,7 @@ export default function Logo({ size = 36, iconSize = 18, showText = true, classN
           </div>
           {size > 30 && (
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 2 }}>
-              Volta Region
+              Ghana
             </div>
           )}
         </div>

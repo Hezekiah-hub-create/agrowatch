@@ -311,7 +311,7 @@ export default function LandingPage() {
           </div>
           <div style={{ borderTop: '1px solid var(--border)', paddingTop: 'var(--sp-8)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--sp-6)' }}>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-              © 2025 AgroWatch Ghana. Built by Hezekiah Tounou for HTU.
+              © 2026 AgroWatch. 
             </div>
             <div style={{ display: 'flex', gap: 'var(--sp-6)', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
               <Link to="/login">Farmer Portal</Link>

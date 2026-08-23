@@ -42,7 +42,7 @@ export default function ListingCard({ listing, onEnquire }) {
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <Calendar size={14} /> Harvest: {new Date(harvest_date).toLocaleDateString()}
           </span>
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{farmer_name}</span>
+          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{farmer_name} ({listing.farmer_phone})</span>
         </div>
         <Button 
           variant="secondary" 

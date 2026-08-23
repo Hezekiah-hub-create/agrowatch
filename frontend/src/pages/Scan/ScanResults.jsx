@@ -76,10 +76,16 @@ export default function ScanResults() {
           <div style={{ 
             height: 400, background: 'var(--bg-input)', position: 'relative',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backgroundImage: 'radial-gradient(var(--border) 1px, transparent 1px)',
-            backgroundSize: '20px 20px'
+            backgroundImage: `url("${scan.image ? (scan.image.startsWith('http') ? scan.image : `http://127.0.0.1:8000${scan.image}`) : 'https://images.unsplash.com/photo-1592982537447-6f2b6a061419?auto=format&fit=crop&q=80&w=1000'}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
+            overflow: 'hidden'
           }}>
-            <p style={{ color: 'var(--text-muted)' }}>Interactive Map View (Simulated)</p>
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }} />
+            <p style={{ color: 'white', position: 'relative', zIndex: 1, textShadow: '0 2px 4px rgba(0,0,0,0.8)', fontWeight: 500 }}>
+              {scan.image ? 'AI Crop Analysis Overlay' : 'Interactive Map View (Simulated)'}
+            </p>
             {/* Simulated bounding boxes for visual effect if we have detections */}
             {scan.detections?.slice(0, 50).map((det, i) => {
               const diseaseFlag = Object.values(DISEASE_CONDITIONS).flat().find(d => d.id === (det.disease_flag_id || det.disease_flag?.id)) || { severity: 'none', label: 'Unknown' };

@@ -5,6 +5,7 @@ import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
 import { scansAPI } from '../../services/api';
+import { DISEASE_CONDITIONS } from '../../data/constants';
 
 export default function DiagnosisReport() {
   const { scanId } = useParams();
@@ -19,17 +20,38 @@ export default function DiagnosisReport() {
         if (found) {
           setScan(found);
           
-          // Group detections by disease ID
+          // Build a lookup of all disease conditions by their class name
+          const cropConditions = DISEASE_CONDITIONS[found.crop_type] || [];
+
+          // Group detections by disease class name
           const groups = {};
           if (found.detections) {
             found.detections.forEach(det => {
-              const d = det.disease_flag;
-              if (d.severity !== 'none') {
-                if (!groups[d.id]) {
-                  groups[d.id] = { condition: d, count: 0 };
-                }
-                groups[d.id].count++;
+              const flagId = det.disease_flag_id || '';
+              if (flagId === 'healthy' || flagId === '') return;
+
+              // Match against DISEASE_CONDITIONS by id or by partial match
+              const condition = cropConditions.find(c =>
+                c.id === flagId ||
+                c.id === `${found.crop_type}_${flagId}` ||
+                c.label.toLowerCase().replace(/\s+/g, '_') === flagId
+              );
+
+              const key = flagId;
+              if (!groups[key]) {
+                groups[key] = {
+                  condition: condition || {
+                    id: flagId,
+                    label: flagId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                    severity: 'medium',
+                    color: 'amber',
+                    description: `Detected "${flagId}" pattern in plant imagery.`,
+                    recommendation: 'Consult an agricultural extension officer for further diagnosis.',
+                  },
+                  count: 0,
+                };
               }
+              groups[key].count++;
             });
           }
           setDiagnosisGroups(Object.values(groups).sort((a, b) => b.count - a.count));

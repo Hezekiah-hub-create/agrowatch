@@ -11,11 +11,14 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Farms from './pages/Farms/Farms';
 import AddFarm from './pages/Farms/AddFarm';
 import NewScan from './pages/Scan/NewScan';
+import Scans from './pages/Scan/Scans';
 import ScanResults from './pages/Scan/ScanResults';
 import DiagnosisReport from './pages/Scan/DiagnosisReport';
 import MarketListings from './pages/Market/MarketListings';
 import CreateListing from './pages/Market/CreateListing';
 import Profile from './pages/Profile/Profile';
+import MessagesPage from './pages/Messages/MessagesPage';
+import AdminPortal from './pages/Admin/AdminPortal';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -50,10 +53,13 @@ function App() {
         <Route path="farms" element={<Farms />} />
         <Route path="farms/new" element={<AddFarm />} />
         <Route path="scan" element={<NewScan />} />
+        <Route path="scans" element={<Scans />} />
         <Route path="scan/:scanId" element={<ScanResults />} />
         <Route path="diagnose/:scanId" element={<DiagnosisReport />} />
         <Route path="market" element={<MarketListings />} />
         <Route path="market/new" element={<CreateListing />} />
+        <Route path="messages" element={<MessagesPage />} />
+        <Route path="admin" element={<AdminPortal />} />
         <Route path="profile" element={<Profile />} />
       </Route>
       

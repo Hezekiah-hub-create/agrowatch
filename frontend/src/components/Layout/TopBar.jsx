@@ -1,8 +1,10 @@
+import { useState, useEffect, useCallback } from 'react';
 import { Menu, Bell } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ThemeToggle from '../UI/ThemeToggle';
 import Logo from '../UI/Logo';
+import { messagingAPI } from '../../services/api';
 
 const getInitials = (name) => {
   if (!name) return '?';
@@ -14,16 +16,42 @@ const getInitials = (name) => {
 
 const PAGE_TITLES = {
   '/dashboard': 'Dashboard',
+  '/admin':     'Admin Portal',
   '/farms':     'My Farms',
   '/scan':      'New Scan',
+  '/scans':     'Drone Scans',
   '/market':    'Market Listings',
+  '/messages':  'Messages',
   '/profile':   'Profile',
 };
 
 export default function TopBar({ onMenuClick }) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const title = PAGE_TITLES[pathname] || (pathname.startsWith('/scan/') ? 'Scan Results' : 'AgroWatch');
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = useCallback(async () => {
+    if (!user || isAdmin) return;
+    try {
+      const notifs = await messagingAPI.listNotifications();
+      setUnreadCount(notifs.filter(n => !n.is_read).length);
+    } catch {
+      // silently ignore polling errors
+    }
+  }, [user, isAdmin]);
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // poll every 30s
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
+
+  const handleBellClick = () => {
+    navigate('/messages');
+  };
 
   return (
     <header 
@@ -65,29 +93,43 @@ export default function TopBar({ onMenuClick }) {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp-3)' }}>
         <ThemeToggle />
-        {/* Notification bell */}
-        <button style={{
-          position: 'relative',
-          width: 38, height: 38,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: 'var(--radius-sm)',
-          background: 'var(--bg-input)',
-          border: '1px solid var(--border)',
-          color: 'var(--text-secondary)',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-card-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
-        onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-input)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
-        >
-          <Bell size={17} />
-          <span style={{
-            position: 'absolute', top: 7, right: 7,
-            width: 7, height: 7, borderRadius: '50%',
-            background: 'var(--amber)',
-            boxShadow: '0 0 6px var(--amber)',
-          }} />
-        </button>
+
+        {/* Notification Bell */}
+        {!isAdmin && (
+          <button
+            onClick={handleBellClick}
+            title="Messages & Notifications"
+            style={{
+              position: 'relative',
+              width: 38, height: 38,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--bg-input)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-card-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-input)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+          >
+            <Bell size={17} />
+            {unreadCount > 0 && (
+              <span style={{
+                position: 'absolute', top: 5, right: 5,
+                minWidth: 16, height: 16, borderRadius: 99,
+                background: 'var(--amber)',
+                boxShadow: '0 0 6px var(--amber)',
+                fontSize: '0.625rem', fontWeight: 800,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#000', padding: '0 3px',
+                lineHeight: 1,
+              }}>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
+        )}
 
         {/* Avatar */}
         <div style={{

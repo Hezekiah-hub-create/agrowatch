@@ -22,6 +22,7 @@ class Scan(models.Model):
     identity_switches = models.IntegerField(default=0)
     
     image_count = models.IntegerField(default=0)
+    image = models.ImageField(upload_to='scans/', null=True, blank=True)
     scan_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

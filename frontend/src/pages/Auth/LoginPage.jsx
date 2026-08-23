@@ -19,8 +19,12 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(phone, password);
-      navigate('/dashboard');
+      const user = await login(phone, password);
+      if (user?.user_role === 'admin' || user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       addToast('Login failed. Please check your credentials.', 'error');
     } finally {

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Tractor, ScanLine, ShoppingBasket,
-  User, LogOut, Leaf, X,
+  User, LogOut, Leaf, X, MessageCircle, Shield
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Logo from '../UI/Logo';
@@ -17,20 +17,30 @@ const getInitials = (name) => {
 const FARMER_LINKS = [
   { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
   { to: '/farms',     icon: <Tractor size={18} />,         label: 'My Farms'  },
-  { to: '/scan',      icon: <ScanLine size={18} />,        label: 'New Scan'  },
-  { to: '/market',    icon: <ShoppingBasket size={18} />,  label: 'Market'    },
+  { to: '/scans',     icon: <ScanLine size={18} />,        label: 'Drone Scans' },
+  { to: '/market',    icon: <ShoppingBasket size={18} />,  label: 'My Products' },
+  { to: '/messages',  icon: <MessageCircle size={18} />,   label: 'Messages'  },
   { to: '/profile',   icon: <User size={18} />,            label: 'Profile'   },
 ];
 
 const BUYER_LINKS = [
-  { to: '/market',  icon: <ShoppingBasket size={18} />, label: 'Market Listings' },
-  { to: '/profile', icon: <User size={18} />,           label: 'Profile'         },
+  { to: '/market',    icon: <ShoppingBasket size={18} />, label: 'Market Listings' },
+  { to: '/messages',  icon: <MessageCircle size={18} />,  label: 'Messages'        },
+  { to: '/profile',   icon: <User size={18} />,           label: 'Profile'         },
+];
+
+const ADMIN_LINKS = [
+  { to: '/admin',     icon: <Shield size={18} />,          label: 'Admin Portal' },
+  { to: '/farms',     icon: <Tractor size={18} />,         label: 'All Farms'    },
+  { to: '/scans',     icon: <ScanLine size={18} />,        label: 'All Scans'    },
+  { to: '/market',    icon: <ShoppingBasket size={18} />,  label: 'All Listings' },
+  { to: '/profile',   icon: <User size={18} />,            label: 'Profile'      },
 ];
 
 export default function Sidebar({ mobileOpen, onClose }) {
-  const { user, logout, isFarmer } = useAuth();
+  const { user, logout, isFarmer, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const links = isFarmer ? FARMER_LINKS : BUYER_LINKS;
+  const links = isAdmin ? ADMIN_LINKS : (isFarmer ? FARMER_LINKS : BUYER_LINKS);
 
   const handleLogout = () => {
     logout();

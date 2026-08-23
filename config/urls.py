@@ -10,15 +10,24 @@ from expert.views import DiseaseConditionViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'farms', FarmViewSet)
+router.register(r'farms', FarmViewSet, basename='farm')
 router.register(r'market/listings', MarketListingViewSet, basename='marketlisting')
-router.register(r'scans', ScanViewSet)
-router.register(r'detections', DetectionViewSet)
-router.register(r'expert/conditions', DiseaseConditionViewSet)
+router.register(r'scans', ScanViewSet, basename='scan')
+router.register(r'detections', DetectionViewSet, basename='detection')
+router.register(r'expert/conditions', DiseaseConditionViewSet, basename='diseasecondition')
+
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/login/', LoginView.as_view(), name='api_login'),
     path('api/auth/register/', RegisterView.as_view(), name='api_register'),
+    path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
+    path('api/messages/', include('messaging.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

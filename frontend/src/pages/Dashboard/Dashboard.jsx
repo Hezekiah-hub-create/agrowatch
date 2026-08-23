@@ -120,7 +120,7 @@ export default function Dashboard() {
             <h3 style={{ fontSize: '1.125rem', display: 'flex', alignItems: 'center', gap: 'var(--sp-2)' }}>
               <ScanLine size={18} className="text-accent" /> Recent Scans
             </h3>
-            <Link to="/scan" className="text-accent" style={{ fontSize: '0.875rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Link to="/scans" className="text-accent" style={{ fontSize: '0.875rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
               View all <ArrowRight size={14} />
             </Link>
           </div>

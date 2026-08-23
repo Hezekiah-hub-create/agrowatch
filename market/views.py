@@ -9,6 +9,11 @@ class MarketListingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = MarketListing.objects.all().order_by('-created_at')
+        user = self.request.user
+        role = getattr(user, 'user_role', None) or getattr(user, 'role', None)
+        if user.is_authenticated and role == 'farmer':
+            queryset = queryset.filter(farmer=user)
+
         crop_type = self.request.query_params.get('crop_type')
         region = self.request.query_params.get('region')
         if crop_type:

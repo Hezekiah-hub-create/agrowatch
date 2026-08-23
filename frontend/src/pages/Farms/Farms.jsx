@@ -7,16 +7,18 @@ import Badge from '../../components/UI/Badge';
 import { useToast } from '../../context/ToastContext';
 import { Tractor, MapPin, Maximize, Plus, ArrowRight, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { CROP_ICONS } from '../../data/constants';
 
 export default function Farms() {
+  const { user, isAdmin } = useAuth();
   const [farms, setFarms] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addToast } = useToast();
 
   const loadFarms = async () => {
     try {
-      const res = await farmsAPI.list();
+      const res = await farmsAPI.list(isAdmin ? null : user?.id);
       setFarms(res);
     } catch (err) {
       console.error(err);
@@ -27,7 +29,7 @@ export default function Farms() {
 
   useEffect(() => {
     loadFarms();
-  }, []);
+  }, [user, isAdmin]);
 
   const [editingFarm, setEditingFarm] = useState(null);
   const [editName, setEditName] = useState('');
@@ -57,12 +59,16 @@ export default function Farms() {
     <div className="animate-fade-in">
       <div className="page-header">
         <div>
-          <h1 className="page-title">My Registered Farms</h1>
-          <p className="page-subtitle">Manage your field plots and crop configurations.</p>
+          <h1 className="page-title">{isAdmin ? 'All Registered Farms' : 'My Registered Farms'}</h1>
+          <p className="page-subtitle">
+            {isAdmin ? 'System-wide registry of farm plots across Ghana.' : 'Manage your field plots and crop configurations.'}
+          </p>
         </div>
-        <Link to="/farms/new">
-          <Button icon={<Plus size={18} />}>Add New Farm</Button>
-        </Link>
+        {!isAdmin && (
+          <Link to="/farms/new">
+            <Button icon={<Plus size={18} />}>Add New Farm</Button>
+          </Link>
+        )}
       </div>
 
       {loading ? (
@@ -70,11 +76,15 @@ export default function Farms() {
           {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 200, borderRadius: 'var(--radius-lg)' }}></div>)}
         </div>
       ) : farms.length === 0 ? (
-        <div className="empty-state glass">
+        <div className="empty-state">
           <Tractor className="empty-state-icon" />
-          <h3 className="empty-state-title">No farms found</h3>
-          <p className="empty-state-desc">Register your first farm plot to start monitoring with drone imagery.</p>
-          <Link to="/farms/new"><Button>Register a Farm</Button></Link>
+          <h3 className="empty-state-title">{isAdmin ? 'No Registered Farms Found' : 'No farms found'}</h3>
+          <p className="empty-state-desc">
+            {isAdmin 
+              ? 'There are currently no farm plots registered in the system.' 
+              : 'Register your first farm plot to start monitoring with drone imagery.'}
+          </p>
+          {!isAdmin && <Link to="/farms/new"><Button>Register a Farm</Button></Link>}
         </div>
       ) : (
         <div className="grid-3">

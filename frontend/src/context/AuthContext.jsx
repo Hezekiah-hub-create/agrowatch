@@ -43,9 +43,9 @@ export function AuthProvider({ children }) {
     localStorage.setItem('agrowatch_user', JSON.stringify(updatedUser));
   };
 
-  const isFarmer = user?.user_role === 'farmer';
-  const isBuyer  = user?.user_role === 'buyer';
-  const isAdmin  = user?.user_role === 'admin';
+  const isAdmin  = user?.user_role === 'admin' || user?.is_staff || user?.is_superuser;
+  const isFarmer = !isAdmin && user?.user_role === 'farmer';
+  const isBuyer  = !isAdmin && user?.user_role === 'buyer';
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser, isFarmer, isBuyer, isAdmin }}>
