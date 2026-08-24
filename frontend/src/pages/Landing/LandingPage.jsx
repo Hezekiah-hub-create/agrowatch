@@ -1,16 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import Badge from '../../components/UI/Badge';
 import ThemeToggle from '../../components/UI/ThemeToggle';
 import Logo from '../../components/UI/Logo';
 import Modal from '../../components/UI/Modal';
-import { Leaf, ShieldCheck, ShoppingBag, ArrowRight, Scan, MapPin, BarChart3, Database, Users, Globe, Activity, Crosshair, Play, Apple, Wheat, Citrus } from 'lucide-react';
+import { Leaf, ShieldCheck, ShoppingBag, ArrowRight, Scan, MapPin, BarChart3, Database, Users, Globe, Activity, Crosshair, Play, Apple, Wheat, Citrus, ChevronLeft, ChevronRight } from 'lucide-react';
+import tomatoCropImg from '../../assets/tomato_crop.png';
+import maizeCropImg from '../../assets/maize_crop.png';
+import pineappleCropImg from '../../assets/pineapple_crop.png';
 
 
 export default function LandingPage() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [activeCrop, setActiveCrop] = useState('tomato');
+
+  useEffect(() => {
+    const crops = ['tomato', 'maize', 'pineapple'];
+    const timer = setInterval(() => {
+      setActiveCrop(prev => {
+        const nextIndex = (crops.indexOf(prev) + 1) % crops.length;
+        return crops[nextIndex];
+      });
+    }, 3500);
+    return () => clearInterval(timer);
+  }, []);
 
   const demoScans = {
     tomato: {
@@ -92,7 +106,7 @@ export default function LandingPage() {
       }}>
         <div className="container grid-hero">
           <div className="animate-fade-in" style={{ textAlign: 'left' }}>
-            <Badge label="REVOLUTIONIZING GHANAIAN AGRICULTURE" variant="accent" style={{ marginBottom: 'var(--sp-6)' }} />
+            <Badge label="SMART AGRICULTURAL SYSTEM" variant="accent" style={{ marginBottom: 'var(--sp-6)' }} />
             <h1 style={{ 
               fontSize: 'clamp(2rem, 4vw, 3.5rem)', 
               lineHeight: 1.15,
@@ -104,15 +118,12 @@ export default function LandingPage() {
               An Integrated <span className="gradient-text">Multi-Crop Monitoring</span>, Pest & Disease Detection, and Market Linkage System
             </h1>
             <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', marginBottom: 'var(--sp-10)', lineHeight: 1.6, maxWidth: 580 }}>
-              Using computer vision to detect plant diseases early, provide treatment advice, and connect healthy harvests directly with buyers for Tomato, Maize, and Pineapple.
+              An AI-powered platform designed to detect plant diseases early, provide treatment recommendations, and connect farmers directly with buyers for Tomato, Maize, and Pineapple.
             </p>
             <div style={{ display: 'flex', gap: 'var(--sp-4)' }}>
               <Link to="/register">
                 <Button size="lg" iconRight={<ArrowRight size={20} />}>Start Monitoring Now</Button>
               </Link>
-              <Button variant="ghost" size="lg" icon={<Play size={18} fill="currentColor" />} onClick={() => setIsVideoOpen(true)}>
-                Watch the Video
-              </Button>
             </div>
             
             <div style={{ marginTop: 'var(--sp-12)', display: 'flex', gap: 'var(--sp-8)', flexWrap: 'wrap' }}>
@@ -256,7 +267,7 @@ export default function LandingPage() {
               borderRadius: 'var(--radius-lg)'
             }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'pulse 1.5s infinite' }} />
-              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#10b981', letterSpacing: '0.05em' }}>TRY DEMO TABS ABOVE</div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#10b981', letterSpacing: '0.05em' }}>CROP SCAN DEMO • AUTO SLIDE</div>
             </div>
           </div>
         </div>
@@ -276,21 +287,24 @@ export default function LandingPage() {
           <div className="grid-3">
             <CropCard 
               name="Tomato" 
-              desc="Early detection of Late Blight, Bacterial Spot, and Leaf Curl Virus to prevent total crop loss." 
+              desc="Early detection of Late Blight, Bacterial Spot, and Leaf Curl Virus to prevent crop loss." 
               benefits={['Early Diagnosis', 'Treatment Advisory', 'Yield Optimization']}
-              image={<Apple size={48} color="var(--accent)" />}
+              icon={<Apple size={20} color="var(--accent)" />}
+              imgSrc={tomatoCropImg}
             />
             <CropCard 
               name="Maize" 
-              desc="Monitoring growth vigor and identifying nitrogen deficiencies in the Ashanti and Volta belts." 
-              benefits={['Growth Tracking', 'Nutrient Analysis', 'Harvest Timing']}
-              image={<Wheat size={48} color="var(--accent)" />}
+              desc="Monitoring growth vigor, fall armyworm symptoms, and nutrient deficiencies in real-time." 
+              benefits={['Growth Tracking', 'Pest Identification', 'Harvest Timing']}
+              icon={<Wheat size={20} color="var(--amber)" />}
+              imgSrc={maizeCropImg}
             />
             <CropCard 
               name="Pineapple" 
-              desc="High-resolution plot management and size estimation for export-grade fruit tracking." 
-              benefits={['Size Calibration', 'Plot Mapping', 'Export Verification']}
-              image={<Citrus size={48} color="var(--accent)" />}
+              desc="Detecting mealybug wilt and heart rot symptoms for export-grade fruit management." 
+              benefits={['Mealybug Control', 'Plot Mapping', 'Export Verification']}
+              icon={<Citrus size={20} color="var(--info)" />}
+              imgSrc={pineappleCropImg}
             />
           </div>
         </div>
@@ -376,28 +390,9 @@ export default function LandingPage() {
           </p>
           <div style={{ display: 'flex', gap: 'var(--sp-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link to="/register"><Button size="lg">Create Your Account</Button></Link>
-            <Button variant="ghost" size="lg">Contact Support</Button>
           </div>
         </div>
       </section>
-
-      {/* Video Modal */}
-      <Modal 
-        open={isVideoOpen} 
-        onClose={() => setIsVideoOpen(false)} 
-        title="AgroWatch in Action"
-        width={900}
-      >
-        <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)' }}>
-          <iframe 
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-            src="https://www.youtube.com/embed/XmGv72p_8vU?autoplay=1"
-            title="AgroWatch Video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      </Modal>
 
       {/* Footer */}
       <footer style={{ borderTop: '1px solid var(--border)', padding: '80px 0', background: 'var(--bg-surface)' }}>
@@ -466,19 +461,34 @@ function Step({ number, icon, title, desc }) {
   );
 }
 
-function CropCard({ name, desc, benefits, image }) {
+function CropCard({ name, desc, benefits, icon, imgSrc }) {
   return (
-    <div className="glass-strong" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)' }}>
-      <div style={{ fontSize: '3rem' }}>{image}</div>
-      <h3 style={{ fontSize: '1.5rem', fontWeight: 700 }}>{name}</h3>
-      <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>{desc}</p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginTop: 'auto' }}>
-        {benefits.map((b, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', color: 'var(--accent)' }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }} />
-            {b}
-          </div>
-        ))}
+    <div className="glass-strong" style={{ overflow: 'hidden', borderRadius: 'var(--radius-xl)', display: 'flex', flexDirection: 'column', border: '1px solid var(--border)' }}>
+      <div style={{ position: 'relative', height: 210, overflow: 'hidden' }}>
+        <img src={imgSrc} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, var(--bg-surface) 0%, transparent 35%)' }} />
+        <div style={{ 
+          position: 'absolute', top: 12, right: 12, 
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)', 
+          padding: '6px 12px', borderRadius: 'var(--radius-md)', 
+          display: 'flex', alignItems: 'center', gap: 6, 
+          color: '#fff', fontSize: '0.8rem', fontWeight: 700,
+          border: '1px solid rgba(255,255,255,0.15)'
+        }}>
+          {icon} {name}
+        </div>
+      </div>
+      <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 'var(--sp-3)', flex: 1 }}>
+        <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{name}</h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>{desc}</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-2)', marginTop: 'auto', paddingTop: 'var(--sp-3)' }}>
+          {benefits.map((b, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem', color: 'var(--accent)' }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }} />
+              {b}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
