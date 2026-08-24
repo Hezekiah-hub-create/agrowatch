@@ -92,19 +92,19 @@ export default function LandingPage() {
       }}>
         <div className="container grid-hero">
           <div className="animate-fade-in" style={{ textAlign: 'left' }}>
-            <Badge label="SMART FARMING FOR GHANA" variant="accent" style={{ marginBottom: 'var(--sp-6)' }} />
+            <Badge label="REVOLUTIONIZING GHANAIAN AGRICULTURE" variant="accent" style={{ marginBottom: 'var(--sp-6)' }} />
             <h1 style={{ 
-              fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', 
-              lineHeight: 1.05,
+              fontSize: 'clamp(2rem, 4vw, 3.5rem)', 
+              lineHeight: 1.15,
               marginBottom: 'var(--sp-6)', 
               fontWeight: 800,
               fontFamily: 'Plus Jakarta Sans',
               color: 'var(--text-primary)'
             }}>
-              Easy <span className="gradient-text">Crop Health Scanning</span> & Market Access
+              An Integrated <span className="gradient-text">Multi-Crop Monitoring</span>, Pest & Disease Detection, and Market Linkage System
             </h1>
-            <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: 'var(--sp-10)', lineHeight: 1.6, maxWidth: 540 }}>
-              Detect plant diseases early, get expert treatment advice, and connect healthy harvests directly with buyers for Tomato, Maize, and Pineapple.
+            <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', marginBottom: 'var(--sp-10)', lineHeight: 1.6, maxWidth: 580 }}>
+              Using computer vision to detect plant diseases early, provide treatment advice, and connect healthy harvests directly with buyers for Tomato, Maize, and Pineapple.
             </p>
             <div style={{ display: 'flex', gap: 'var(--sp-4)' }}>
               <Link to="/register">
